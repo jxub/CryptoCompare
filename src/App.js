@@ -24,11 +24,11 @@ const TitleBar = (props) => (
   />
 )
 
-const SiteInfo = (props) => {
+function SiteInfo(props) {
   if (!props.siteInfoShown) return <span></span>;
   return (
-    <div className="App-explanation">
-      <p className="App-text">
+    <div className="info-tab">
+      <p>
         Compare cryptocurrency performance and rank of the top 10 cryptocurrencies by market cap
       </p>
     </div>
@@ -39,45 +39,36 @@ export default class App extends Component {
     constructor(props) {
       super(props);
       this.state = {
-        coins: [],
-        coinData: {},
-        cryptoCompareOk: false,
+        coinsData: [],
+        coinsMetaData: {},
+        cryptoCompareOk: false, // the cryptocompare API may deny requests due to CORS
         siteInfoShown: true,
       };
       this.loadData = this.loadData.bind(this);
       this.handleTitleClick = this.handleTitleClick.bind(this);
     }
 
-    loadData() {
-      axios.get(COINMARKETCAP_API_URI).then((coins) => {
-        console.log(`Coins: ${JSON.stringify(coins)}`);
-        this.setState({
-          coins: coins.data,
-        });
-      }).catch((err) => console.log(`Error fetching coins ${err}`));
-      
-      axios({
-        url: CRYPTOCOMPARE_API_URI,
-        headers: {
-          "Access-Control-Allow-Origin": "*"
-        },
-      }).then((coinData) => {
-        console.log(`Coin Data: ${JSON.stringify(coinData)}`);
-        this.setState({
-          coinData: coinData.data.Data,
-          cryptoCompareOk: true,
-        });
-      }).catch((err) => console.log(`Error fetching coinData ${err}`));
-    }
+    async loadData() {
+      const coinsData = await axios.get(COINMARKETCAP_API_URI);
+      this.setState({
+        coinsData: coinsData.data,
+      });
 
-    componentDidMount() {
-      this.loadData();
+      const coinsMetaData = await axios.get(CRYPTOCOMPARE_API_URI);
+      this.setState({
+        coinsMetaData: coinsMetaData.data.Data,
+        cryptoCompareOk: true,
+      });
+    }
+    
+    async componentDidMount() {
+      await this.loadData();
       setInterval(this.loadData, 600000);
     }
 
     getCoinImage(symbol) {
       if (!this.state.cryptoCompareOk) return "";
-      return CRYPTOCOMPARE_API_URI + this.state.coinData[symbol].ImageUrl;
+      return CRYPTOCOMPARE_API_URI + this.state.coinsMetaData[symbol].ImageUrl;
     }
 
     handleTitleClick() {
@@ -88,7 +79,7 @@ export default class App extends Component {
 
     render() {
       const siteInfoShown = this.state.siteInfoShown;
-      const coinRows = this.state.coins.map((coin, index) => {
+      const coinRows = this.state.coinsData.map((coin, index) => {
         return (
           <TableRow key={index}>
             <TableRowColumn>{coin.rank}</TableRowColumn>
@@ -106,9 +97,9 @@ export default class App extends Component {
         <div className="App">
             <TitleBar onClick={this.handleTitleClick}/>
             <SiteInfo siteInfoShown={siteInfoShown} />
-            <div className="App-table">
+            <div className="crypto-table">
               <Table>
-                <TableHeader>
+                <TableHeader className="info-animation">
                   <TableRow>
                     <TableHeaderColumn>Rank</TableHeaderColumn>
                     <TableHeaderColumn>Name</TableHeaderColumn>
