@@ -63,7 +63,7 @@ export default class App extends Component {
     
     async componentDidMount() {
       await this.loadData();
-      setInterval(this.loadData, 600000);
+      setInterval(this.loadData, 4000);
     }
 
     getCoinImage(symbol) {
