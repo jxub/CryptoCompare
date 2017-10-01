@@ -25,7 +25,7 @@ const TitleBar = (props) => (
 )
 
 function SiteInfo(props) {
-  if (!props.siteInfoShown) return <span></span>;
+  if (!props.siteInfoShown) return <span />;
   return (
     <div className="info-tab">
       <p>
@@ -78,44 +78,43 @@ export default class App extends Component {
     }
 
     render() {
+      const getColor = (num) => ({color: (num > 0 ? 'green' : 'red')})
       const siteInfoShown = this.state.siteInfoShown;
-      const coinRows = this.state.coinsData.map((coin, index) => {
-        return (
-          <TableRow key={index}>
-            <TableRowColumn>{coin.rank}</TableRowColumn>
-            <TableRowColumn><img src={this.getCoinImage(coin.symbol)} alt=""></img>{coin.name}</TableRowColumn>
-            <TableRowColumn>{coin.symbol}</TableRowColumn>
-            <TableRowColumn>{coin.price_usd}</TableRowColumn>
-            <TableRowColumn>{coin.percent_change_1h}</TableRowColumn>
-            <TableRowColumn>{coin.percent_change_24h}</TableRowColumn>
-            <TableRowColumn>{coin.percent_change_7d}</TableRowColumn>
-            <TableRowColumn>{coin.market_cap_usd}</TableRowColumn>
-          </TableRow>
-        ) 
-      });
+      const coinRows = this.state.coinsData.map((coin, index) => (
+        <TableRow key={index}>
+          <TableRowColumn>{coin.rank}</TableRowColumn>
+          <TableRowColumn><img src={this.getCoinImage(coin.symbol)} alt=""></img>{coin.name}</TableRowColumn>
+          <TableRowColumn>{coin.symbol}</TableRowColumn>
+          <TableRowColumn>{coin.price_usd}</TableRowColumn>
+          <TableRowColumn style={getColor(coin.percent_change_1h)}>{coin.percent_change_1h}</TableRowColumn>
+          <TableRowColumn style={getColor(coin.percent_change_1h)}>{coin.percent_change_24h}</TableRowColumn>
+          <TableRowColumn style={getColor(coin.percent_change_1h)}>{coin.percent_change_7d}</TableRowColumn>
+          <TableRowColumn>{coin.market_cap_usd}</TableRowColumn>
+        </TableRow>
+      ));
       return (
         <div className="App">
-            <TitleBar onClick={this.handleTitleClick}/>
-            <SiteInfo siteInfoShown={siteInfoShown} />
-            <div className="crypto-table">
-              <Table>
-                <TableHeader className="info-animation">
-                  <TableRow>
-                    <TableHeaderColumn>Rank</TableHeaderColumn>
-                    <TableHeaderColumn>Name</TableHeaderColumn>
-                    <TableHeaderColumn>Symbol</TableHeaderColumn>
-                    <TableHeaderColumn>Price (USD)</TableHeaderColumn>
-                    <TableHeaderColumn>1H</TableHeaderColumn>
-                    <TableHeaderColumn>1D</TableHeaderColumn>
-                    <TableHeaderColumn>1W</TableHeaderColumn>
-                    <TableHeaderColumn>Market Cap (USD)</TableHeaderColumn>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {coinRows}
-                </TableBody>  
-              </Table>
-            </div>
+          <TitleBar onClick={this.handleTitleClick}/>
+          <SiteInfo siteInfoShown={siteInfoShown} />
+          <div className="crypto-table">
+            <Table>
+              <TableHeader className="info-animation">
+                <TableRow>
+                  <TableHeaderColumn>Rank</TableHeaderColumn>
+                  <TableHeaderColumn>Name</TableHeaderColumn>
+                  <TableHeaderColumn>Symbol</TableHeaderColumn>
+                  <TableHeaderColumn>Price (USD)</TableHeaderColumn>
+                  <TableHeaderColumn>1H</TableHeaderColumn>
+                  <TableHeaderColumn>1D</TableHeaderColumn>
+                  <TableHeaderColumn>1W</TableHeaderColumn>
+                  <TableHeaderColumn>Market Cap (USD)</TableHeaderColumn>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {coinRows}
+              </TableBody>  
+            </Table>
+          </div>
         </div>
       );
     }
